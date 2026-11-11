@@ -1,51 +1,117 @@
-# Jeevan Raksha – Hospital Management System
+Hospital Healthcare Portal
 
-## Setup
+A full-stack web application designed to simplify hospital operations and improve patient accessibility through an integrated healthcare management platform.
 
-1. Install dependencies:
-   ```
-   npm install
-   ```
+About the Project
 
-2. Make sure MongoDB is running locally on port 27017.
+This project provides a centralized platform for patients and hospital administrators to manage healthcare services efficiently. It brings together appointment scheduling, real-time doctor availability, medical reports, laboratory services, bed requests and ambulance management.
 
-3. Seed the database with doctors and slots (run once):
-   ```
-   node seed.js
-   ```
+Features
 
-4. Start the server:
-   ```
-   node app.js
-   ```
+Patient Features
+- Patient registration and login
+- Browse doctors and hospital services
+- Book doctor appointments
+- View doctor availability and appointment slots
+- Access personal medical reports
+- Update health details
+- Request hospital beds
+- Request ambulance services
+- Book laboratory tests
 
-5. Visit: http://localhost:8080/home
+Admin Features
+- Admin registration and login
+- Manage appointment bookings
+- Confirm or cancel appointments
+- Manage doctor schedules and slots
+- Manage laboratory tests
+- Manage hospital beds and bed requests
+- Manage ambulance availability
+- Upload and manage patient medical reports
 
----
+Tech Stack
 
-## What's New (v2)
+**Frontend**
+- HTML
+- CSS
+- JavaScript
+- EJS
 
-### Patient Features
-- **Appointment Booking** — Doctor cards shown in a grid, each displaying available time slots as clickable chips. Filter by hospital, department, and date.
-- **Lab Test Booking** — Hospital selector cards + full time slot grid (07:00 AM – 07:00 PM) with visual feedback.
-- **Book a Bed** — Visual ward-type selector (General / Private / ICU) with live availability counts.
-- **Request Ambulance** — Dispatches nearest available unit.
-- **Medical Reports** — View all uploaded lab reports, X-rays, prescriptions, and discharge summaries.
-- **Login Required** — All booking features require registration/login.
+**Backend**
+- Node.js
+- Express.js
 
-### Admin Features
-- **Medical Reports** — Upload reports per patient (name, ID, type, doctor, hospital, notes). Delete entries.
-- **Bed Requests** — Approve or reject patient bed requests.
-- Full CRUD for bookings, lab tests, slots, beds, ambulances.
+**Database**
+- MongoDB
+- Mongoose
 
-### Pre-seeded Doctors (after running seed.js)
-| ID   | Name             | Specialization   | Hospital                |
-|------|------------------|------------------|-------------------------|
-| D001 | Dr. Priya Sharma | Cardiology       | City Hospital           |
-| D002 | Dr. Rahul Mehta  | Neurology        | Sunrise Medical Center  |
-| D003 | Dr. Anita Verma  | Gynecology       | Apollo Clinic           |
-| D004 | Dr. Suresh Kumar | Orthopedics      | City Hospital           |
-| D005 | Dr. Neha Gupta   | Dermatology      | Sunrise Medical Center  |
-| D006 | Dr. Vikram Singh | General Medicine | Apollo Clinic           |
+**Other Tools & Libraries**
+- Express Session
+- Nodemon
 
-Each doctor has 10 slots/day for 7 days (4 slots on Sundays).
+Project Structure
+
+```text
+se_final/
+│
+├── models/          # MongoDB schemas
+├── public/          # Static files (CSS, JS, images)
+├── views/           # EJS templates
+├── app.js           # Main server file
+├── package.json
+└── package-lock.json
+```
+
+## Installation and Setup
+
+### 1. Clone the repository
+
+```bash
+git clone <repository-url>
+```
+
+### 2. Navigate to the project directory
+
+```bash
+cd fullstack_hospital
+```
+
+### 3. Install dependencies
+
+```bash
+npm install
+```
+
+### 4. Start MongoDB
+
+Ensure that MongoDB is installed and running locally.
+
+The application currently connects to:
+
+```text
+mongodb://127.0.0.1:27017/hospitaldb
+```
+
+### 5. Start the application
+
+```bash
+npm run dev
+```
+
+### 6. Open in browser
+
+```text
+http://localhost:8080
+```
+
+## Future Improvements
+
+- Real-time patient queue tracking
+- Automated appointment reminders
+- Enhanced authentication and security
+- Improved dashboard analytics
+- Online payment integration
+
+## License
+
+This project is developed for educational purposes.
