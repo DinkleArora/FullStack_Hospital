@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin: Manage Lab Tests</title>
+    <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/footer.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <style>
+    /* --- MAIN CONTENT & CONTAINER --- */
+    .booking-section { /* Using the same class name for layout consistency */
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+      min-height: calc(100vh - 65px);
+    }
+
+    .booking-container {
+      width: 100%;
+      max-width: 1000px; /* Wider container for the table */
+      background: var(--card);
+      padding: 40px;
+      border-radius: 12px;
+      border: 1px solid rgba(58, 123, 255, 0.3);
+      box-shadow: 0 4px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    .booking-container h2 {
+      text-align: left;
+      color: var(--accent);
+      margin-bottom: 20px;
+      font-size: 24px;
+      padding-bottom: 10px;
+    }
+    
+    /* --- FORM STYLES --- */
+    .booking-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr; /* Two columns for better space usage */
+      gap: 15px 25px;
+      margin-bottom: 40px;
+    }
+
+    .form-row { grid-column: span 1; }
+    .booking-form .form-row:nth-child(4), /* Description span two columns */
+    .booking-form button { grid-column: 1 / span 2; }
+
+    .form-row label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+      color: var(--text-light);
+    }
+
+    .booking-form input,
+    .booking-form select,
+    .booking-form textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #334e7a;
+      background: var(--input-bg);
+      color: var(--text-light);
+      transition: border-color 0.3s;
+    }
+
+    .booking-form input:focus,
+    .booking-form select:focus,
+    .booking-form textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 5px rgba(58, 123, 255, 0.5);
+    }
+
+    /* Fix select box visibility (like in booking.ejs) */
+    .booking-form select {
+      color: #000000;
+      background-color: #ffffff;
+    }
+    .booking-form select option {
+        color: #000000;
+        background-color: #ffffff;
+    }
+    
+    /* --- BUTTON STYLES --- */
+    .btn {
+      background: var(--accent);
+      padding: 12px 20px;
+      border: none;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    .btn:hover {
+      background: #2a68e6;
+    }
+    
+    /* Small button for table actions */
+    .btn.small {
+        padding: 6px 10px;
+        font-size: 13px;
+    }
+
+    /* Secondary button for Edit/Delete (less prominence) */
+    .btn.secondary {
+        background: #334e7a;
+        margin-right: 5px;
+    }
+    .btn.secondary:hover {
+        background: #446699;
+    }
+    .btn.delete {
+        background: var(--danger);
+    }
+    .btn.delete:hover {
+        background: #b02a37;
+    }
+
+    /* --- ALERT STYLES --- */
+    .alert {
+        padding: 15px;
+        border-radius: 6px;
+        margin-top: 20px;
+        font-weight: 600;
+        text-align: center;
+        border: 1px solid transparent;
+        margin-bottom: 20px;
+    }
+    .alert.success {
+        background-color: rgba(40, 167, 69, 0.2);
+        color: var(--success);
+        border-color: var(--success);
+    }
+    .alert.error {
+        background-color: rgba(220, 53, 69, 0.2);
+        color: var(--danger);
+        border-color: var(--danger);
+    }
+
+    /* --- TABLE STYLES --- */
+    hr {
+        border: 0;
+        height: 1px;
+        background-color: #334e7a;
+        margin: 30px 0;
+    }
+    
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        border-radius: 8px;
+        overflow: hidden; /* Important for rounded corners on the table */
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    table th, table td {
+        padding: 12px 15px;
+        text-align: left;
+        border: 1px solid #1a3461; /* Dark border lines */
+    }
+
+    table th {
+        background-color: var(--accent);
+        color: white;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 14px;
+    }
+
+    table tr:nth-child(even) {
+        background-color: #1a3461; /* Slightly lighter row background */
+    }
+    
+    table tr:nth-child(odd) {
+        background-color: var(--card); /* Base row background */
+    }
+
+    table tr:hover {
+        background-color: #244270; /* Hover effect for clarity */
+    }
+    
+    table td {
+        font-size: 14px;
+        color: var(--text-light);
+    }
+    
+    table td:last-child {
+        white-space: nowrap; /* Prevent action buttons from wrapping */
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .booking-form {
+            grid-template-columns: 1fr;
+        }
+        .form-row { grid-column: span 1 !important; }
+        .booking-form button { grid-column: 1 / span 1 !important; }
+        
+        /* Making table responsive by collapsing */
+        table, thead, tbody, th, td, tr {
+            display: block;
+        }
+        table thead tr {
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+        }
+        table tr {
+            border: 1px solid #334e7a;
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
+        table td {
+            border: none;
+            position: relative;
+            padding-left: 50%;
+            text-align: right;
+        }
+        table td:before {
+            content: attr(data-label);
+            position: absolute;
+            left: 0;
+            width: 45%;
+            padding-left: 15px;
+            font-weight: 600;
+            color: var(--accent);
+            text-align: left;
+        }
+    }
+
+  </style>
+</head>
+
+<body>
+<!-- Header -->
+  <header class="main-header">
+  <div class="logo-section">
+    <i class="fas fa-heartbeat logo-icon"></i>
+    <h1>Jeevan Raksha</h1>
+  </div>
+  <nav class="center-nav">
+  <a href="/admin">Home</a>
+  <a href="/about">About</a>
+  <a href="/doctors">Doctors</a>
+  <a href="#footer">Contact</a>
+</nav>
+<div class="nav-right">
+  <% if (session && session.user) { %>
+    <!-- PROFILE DROPDOWN -->
+    <div class="profile-dropdown">
+      <button class="profile-btn" id="profileBtn">
+        <i class="fa fa-user-circle"></i>
+        <span><%= session.user.name %></span>
+        <i class="fa fa-caret-down"></i>
+      </button>
+
+      <div class="dropdown-menu" id="dropdownMenu">
+        <a href="/logout">Logout</a>
+      </div>
+    </div>
+
+  <% } else { %>
+    <a href="/login" class="login-btn">Login</a>
+  <% } %>
+</div>
+</header>
+  
+<section class="booking-section">
+<div class="booking-container">
+
+<h2>Add New Lab Test</h2>
+
+<form action="/admin/lab-tests/add" method="POST" class="booking-form">
+
+    <div class="form-row">
+        <label>Test Name</label>
+        <input type="text" name="name" required>
+    </div>
+
+    <div class="form-row">
+        <label>Category</label>
+        <select name="category" required>
+            <option value="">Select Category</option>
+            <option value="Blood Test">Blood Test</option>
+            <option value="Hormone">Hormone</option>
+            <option value="Imaging">Imaging</option>
+            <option value="Vitamin">Vitamin</option>
+            <option value="Infection">Infection</option>
+        </select>
+    </div>
+
+    <div class="form-row">
+        <label>Price (₹)</label>
+        <input type="number" name="price" required>
+    </div>
+
+    <!-- Placeholder to maintain two-column layout for small fields -->
+    <div class="form-row" style="opacity: 0;"></div> 
+
+    <div class="form-row">
+        <label>Description</label>
+        <textarea name="description" rows="3" required></textarea>
+    </div>
+
+    <button type="submit" class="btn">Add Test</button>
+
+</form>
+
+<% if (msg) { %>
+<div class="alert success"><i class="fas fa-check-circle"></i> <%= msg %></div>
+<% } %>
+
+<% if (errorMsg) { %>
+<div class="alert error"><i class="fas fa-times-circle"></i> <%= errorMsg %></div>
+<% } %>
+
+<hr>
+
+<h2>All Lab Tests</h2>
+
+<table>
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Category</th>
+        <th>Price</th>
+        <th>Description</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <% if (typeof labTests !== 'undefined' && labTests.length > 0) { %>
+        <% labTests.forEach(test => { %>
+        <tr>
+            <td data-label="Name"><%= test.name %></td>
+            <td data-label="Category"><%= test.category %></td>
+            <td data-label="Price">₹<%= test.price %></td>
+            <td data-label="Description" style="max-width: 300px;"><%= test.description %></td>
+            <td data-label="Actions">
+                <a href="/admin/lab-tests/edit/<%= test._id %>" class="btn small secondary"><i class="fas fa-edit"></i> Edit</a>
+                <a href="/admin/lab-tests/delete/<%= test._id %>" class="btn small delete"><i class="fas fa-trash-alt"></i> Delete</a>
+            </td>
+        </tr>
+        <% }) %>
+    <% } else { %>
+        <tr>
+            <td colspan="5" style="text-align: center; font-style: italic; color: #aaa;">No lab tests currently configured.</td>
+        </tr>
+    <% } %>
+    </tbody>
+</table>
+
+</div>
+</section>
+<!-- Footer Section -->
+  <footer id="footer" class="footer">
+
+  <div class="footer-container">
+
+    <!-- About Section -->
+    <div class="footer-section about">
+      <h3>Jeevan Raksha </h3>
+      <p>Delivering trusted, advanced, and compassionate healthcare since 1995.</p>
+      <p class="emergency"><b>Emergency Helpline:</b> <span>+91 108 / +91 98765 43210</span></p>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="footer-section">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="/admin">Home</a></li>
+        <li><a href="/about">About Us</a></li>
+        <li><a href="/doctors">Doctors</a></li>
+        <li><a href="#footer">Contact</a></li>
+      </ul>
+    </div>
+
+    <!-- Patient Services -->
+    <div class="footer-section">
+      <h4>Patient Services</h4>
+      <ul>
+        <li><a href="/admin/manage-bookings">Manage Bookings</a></li>
+        <li><a href="/admin/lab-tests">Lab Test</a></li>
+        <li><a href="/reports">Upload Reports</a></li>
+        <li><a href="/faq">FAQs</a></li>
+      </ul>
+    </div>
+
+    <!-- Contact Section -->
+    <div class="footer-section">
+      <h4>Contact Us</h4>
+      <p>📍 21, Health Street, Jaipur, Rajasthan, India</p>
+      <p>📞 +91 98765 43210</p>
+      <p>✉️ contact@jeevanraksha.in</p>
+    </div>
+
+    <!-- Social Section -->
+    <div class="footer-section">
+      <h4>Follow Us</h4>
+    <div class="social-icons">
+      <a href="#"><i class="fab fa-facebook"></i></a>
+      <a href="#"><i class="fab fa-instagram"></i></a>
+      <a href="#"><i class="fab fa-twitter"></i></a>
+      <a href="#"><i class="fab fa-linkedin"></i></a>
+      <a href="#"><i class="fab fa-youtube"></i></a>
+    </div>
+    </div>
+
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 Jeevan Raksha Hospital • Secure | Smart | Live Health Insights</p>
+  </div>
+
+</footer>
+<script>
+const btn = document.getElementById("profileBtn");
+const menu = document.getElementById("dropdownMenu");
+
+// When the profile button is clicked
+if (btn) {
+  btn.addEventListener("click", function (event) {
+    event.stopPropagation();
+    menu.style.display =
+      menu.style.display === "block" ? "none" : "block";
+  });
+}
+
+// Close dropdown when clicking anywhere on screen
+document.addEventListener("click", function () {
+  if (menu) menu.style.display = "none";
+});
+</script>
+</body>
+</html>
+
+Tools

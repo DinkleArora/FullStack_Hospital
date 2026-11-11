@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>My Dashboard – Jeevan Raksha</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/footer.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .dash-container { padding: 40px 20px; max-width: 1050px; margin: 0 auto; }
+    h2.page-title { color: var(--accent); text-align: center; margin-bottom: 30px; font-size: 2em; border-bottom: 2px solid rgba(58,123,255,0.3); padding-bottom: 10px; }
+    .profile-card { background: var(--card); border: 1px solid rgba(58,123,255,0.3); border-radius: 14px; padding: 28px; margin-bottom: 30px; display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; }
+    .profile-avatar { font-size: 4em; color: var(--accent); }
+    .profile-info h3 { margin: 0 0 6px 0; font-size: 1.4em; color: #e6eef6; }
+    .profile-info p { margin: 4px 0; color: var(--muted, #8aa0c0); font-size: .95em; }
+    .pid { background: rgba(58,123,255,.15); color: var(--accent); padding: 2px 10px; border-radius: 20px; font-size: .85em; display: inline-block; margin-top: 4px; }
+    .section-title { color: var(--accent); font-size: 1.1em; margin: 28px 0 14px 0; font-weight: 600; }
+    .table-container { overflow-x: auto; background: var(--card); border-radius: 12px; border: 1px solid rgba(58,123,255,0.3); margin-bottom: 28px; }
+    .appt-table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 560px; }
+    .appt-table th, .appt-table td { padding: 11px 14px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .appt-table th { background: #1a3461; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; font-size: .8em; }
+    .badge-pending { background: rgba(255,193,7,.15); color: #ffc107; padding: 3px 10px; border-radius: 20px; font-size: .82em; font-weight: 700; }
+    .badge-confirmed { background: rgba(74,222,128,.15); color: #4ade80; padding: 3px 10px; border-radius: 20px; font-size: .82em; font-weight: 700; }
+    .badge-cancelled { background: rgba(248,113,113,.15); color: #f87171; padding: 3px 10px; border-radius: 20px; font-size: .82em; font-weight: 700; }
+    .badge-approved { background: rgba(74,222,128,.15); color: #4ade80; padding: 3px 10px; border-radius: 20px; font-size: .82em; font-weight: 700; }
+    .badge-rejected { background: rgba(248,113,113,.15); color: #f87171; padding: 3px 10px; border-radius: 20px; font-size: .82em; font-weight: 700; }
+    .msg-success { color: #4ade80; background: rgba(74,222,128,.1); padding: 10px 16px; border-radius: 8px; margin-bottom: 16px; }
+    .msg-error { color: #f87171; background: rgba(248,113,113,.1); padding: 10px 16px; border-radius: 8px; margin-bottom: 16px; }
+    .quick-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 28px; }
+    .quick-card { background: var(--card); border: 1px solid rgba(58,123,255,0.3); border-radius: 12px; padding: 18px; text-align: center; transition: border-color .2s; }
+    .quick-card:hover { border-color: var(--accent); }
+    .quick-card i { font-size: 1.8em; color: var(--accent); margin-bottom: 8px; }
+    .quick-card i.bed-icon { color: #a78bfa; }
+    .quick-card i.report-icon { color: #34d399; }
+    .quick-card h4 { margin: 0 0 6px 0; font-size: .95em; color: #e6eef6; }
+    .quick-card p { margin: 0 0 12px 0; color: var(--muted, #8aa0c0); font-size: .8em; }
+    .btn-sm { background: var(--accent); color: white; border: none; padding: 7px 16px; border-radius: 7px; font-size: .85em; cursor: pointer; text-decoration: none; display: inline-block; }
+    .btn-sm:hover { opacity: .85; }
+    .btn-sm.bed { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
+    .btn-sm.report { background: linear-gradient(135deg, #059669, #047857); }
+    .health-form textarea { background: #0f1724; border: 1px solid rgba(58,123,255,.3); color: #e6eef6; padding: 10px; border-radius: 8px; width: 100%; font-size: 14px; resize: vertical; min-height: 80px; }
+    .reports-mini { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; margin-bottom: 24px; }
+    .report-mini-card { background: var(--card); border: 1px solid rgba(52,211,153,0.2); border-radius: 10px; padding: 14px; }
+    .report-mini-card h4 { color: #e6eef6; font-size: .9em; margin: 0 0 4px 0; }
+    .report-mini-card p { color: #8aa0c0; font-size: .78em; margin: 0; }
+    .report-mini-card .type-tag { display: inline-block; padding: 1px 8px; border-radius: 20px; font-size: .72em; font-weight: 700; margin-bottom: 6px; background: rgba(52,211,153,0.15); color: #34d399; }
+  </style>
+</head>
+<body>
+  <header class="main-header">
+    <div class="logo-section">
+      <i class="fas fa-heartbeat logo-icon"></i>
+      <h1>Jeevan Raksha</h1>
+    </div>
+    <nav class="center-nav">
+      <a href="/home">Home</a>
+      <a href="/about">About</a>
+      <a href="/doctors">Doctors</a>
+      <a href="#footer">Contact</a>
+    </nav>
+    <div class="nav-right">
+      <% if (session && session.user) { %>
+        <div class="profile-dropdown">
+          <button class="profile-btn" id="profileBtn">
+            <i class="fa fa-user-circle"></i>
+            <span><%= session.user.name %></span>
+            <i class="fa fa-caret-down"></i>
+          </button>
+          <div class="dropdown-menu" id="dropdownMenu">
+            <a href="/patient/dashboard">My Dashboard</a>
+            <a href="/logout">Logout</a>
+          </div>
+        </div>
+      <% } else { %>
+        <a href="/login" class="login-btn">Login</a>
+      <% } %>
+    </div>
+  </header>
+
+  <main class="dash-container">
+    <h2 class="page-title"><i class="fas fa-user-injured"></i> Patient Dashboard</h2>
+
+    <% if (msg) { %><div class="msg-success"><%= msg %></div><% } %>
+    <% if (errorMsg) { %><div class="msg-error"><%= errorMsg %></div><% } %>
+
+    <!-- Profile -->
+    <div class="profile-card">
+      <div class="profile-avatar"><i class="fas fa-user-circle"></i></div>
+      <div class="profile-info">
+        <h3><%= patient.patientName %></h3>
+        <span class="pid">ID: <%= patient.patientId %></span>
+        <p style="margin-top:10px;"><strong>Health Details:</strong> <%= patient.healthDetails || 'Not provided' %></p>
+        <% if (patient.bedId) { %>
+          <p><strong>Assigned Bed:</strong> <%= patient.bedId %></p>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- Update health details -->
+    <div class="section-title"><i class="fas fa-notes-medical"></i> Update Health Details</div>
+    <form action="/patient/update-health" method="POST" class="health-form" style="margin-bottom:28px;">
+      <textarea name="healthDetails" placeholder="Enter your health details, medical history, allergies..."><%= patient.healthDetails || '' %></textarea>
+      <button type="submit" class="btn-sm" style="margin-top:10px;">Save Details</button>
+    </form>
+
+    <!-- Quick Actions -->
+    <div class="section-title"><i class="fas fa-bolt"></i> Quick Actions</div>
+    <div class="quick-actions">
+      <div class="quick-card">
+        <i class="fas fa-calendar-plus"></i>
+        <h4>Book Appointment</h4>
+        <p>Schedule a visit with a specialist doctor.</p>
+        <a href="/booking" class="btn-sm">Book Now</a>
+      </div>
+      <div class="quick-card">
+        <i class="fas fa-bed bed-icon"></i>
+        <h4>Book a Bed</h4>
+        <p>Request a hospital bed in advance.</p>
+        <a href="/patient/book-bed" class="btn-sm bed">Book Bed</a>
+      </div>
+      <div class="quick-card">
+        <i class="fas fa-ambulance"></i>
+        <h4>Request Ambulance</h4>
+        <p>Emergency? Get ambulance dispatched.</p>
+        <a href="/patient/request-ambulance" class="btn-sm" style="background:#ef4444;">Request</a>
+      </div>
+      <div class="quick-card">
+        <i class="fas fa-flask"></i>
+        <h4>Lab Tests</h4>
+        <p>Browse and book diagnostic lab tests.</p>
+        <a href="/lab-tests" class="btn-sm">Browse</a>
+      </div>
+      <div class="quick-card">
+        <i class="fas fa-file-medical-alt report-icon"></i>
+        <h4>My Reports</h4>
+        <p>View all your medical reports.</p>
+        <a href="/patient/reports" class="btn-sm report">View Reports</a>
+      </div>
+    </div>
+
+    <!-- Recent Medical Reports -->
+    <div class="section-title"><i class="fas fa-file-medical-alt"></i> Recent Medical Reports</div>
+    <% if (reports && reports.length > 0) { %>
+      <div class="reports-mini">
+        <% reports.slice(0,4).forEach(r => { %>
+          <div class="report-mini-card">
+            <span class="type-tag"><%= r.reportType %></span>
+            <h4><%= r.reportTitle %></h4>
+            <p><%= r.doctor ? 'Dr. ' + r.doctor : '' %> <%= r.hospital || '' %></p>
+            <p style="margin-top:4px;font-size:.73em;color:#60a5fa;"><%= new Date(r.uploadedAt).toLocaleDateString('en-IN') %></p>
+          </div>
+        <% }) %>
+      </div>
+      <a href="/patient/reports" class="btn-sm report" style="margin-bottom:20px;">View All Reports →</a>
+    <% } else { %>
+      <p style="color:#8aa0c0;font-size:.9em;margin-bottom:24px;">No medical reports yet. Reports uploaded by your hospital will appear here.</p>
+    <% } %>
+
+    <!-- My Appointments -->
+    <div class="section-title"><i class="fas fa-calendar-check"></i> My Appointments</div>
+    <div class="table-container">
+      <table class="appt-table">
+        <thead>
+          <tr>
+            <th>Doctor</th>
+            <th>Hospital</th>
+            <th>Dept</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (appointments && appointments.length > 0) { %>
+            <% appointments.forEach(a => { %>
+              <tr>
+                <td><%= a.doctor %></td>
+                <td><%= a.hospital %></td>
+                <td><%= a.department || '—' %></td>
+                <td><%= new Date(a.date).toLocaleDateString('en-IN') %></td>
+                <td><%= a.time %></td>
+                <td>
+                  <% const s = a.status || 'Pending'; %>
+                  <span class="badge-<%= s.toLowerCase() %>"><%= s %></span>
+                </td>
+              </tr>
+            <% }) %>
+          <% } else { %>
+            <tr><td colspan="6" style="text-align:center;padding:20px;color:#8aa0c0;">No appointments yet.</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Bed Requests -->
+    <% if (bedRequests && bedRequests.length > 0) { %>
+      <div class="section-title"><i class="fas fa-bed"></i> My Bed Requests</div>
+      <div class="table-container">
+        <table class="appt-table">
+          <thead>
+            <tr><th>Ward Type</th><th>Preferred Date</th><th>Reason</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <% bedRequests.forEach(br => { %>
+              <tr>
+                <td><%= br.wardType %></td>
+                <td><%= new Date(br.preferredDate).toLocaleDateString('en-IN') %></td>
+                <td><%= br.reason || '—' %></td>
+                <td><span class="badge-<%= br.status.toLowerCase() %>"><%= br.status %></span></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </main>
+
+  <footer id="footer" class="footer">
+    <div class="footer-container">
+      <div class="footer-section about"><h3>Jeevan Raksha</h3><p>Delivering trusted, advanced healthcare since 1995.</p><p class="emergency"><b>Emergency:</b> <span>+91 108</span></p></div>
+      <div class="footer-section"><h4>Quick Links</h4><ul><li><a href="/home">Home</a></li><li><a href="/about">About</a></li></ul></div>
+      <div class="footer-section"><h4>Services</h4><ul><li><a href="/booking">Book Appointment</a></li><li><a href="/lab-tests">Lab Tests</a></li><li><a href="/patient/book-bed">Book Bed</a></li><li><a href="/patient/reports">My Reports</a></li></ul></div>
+      <div class="footer-section"><h4>Contact</h4><p>📞 +91 98765 43210</p><p>✉️ contact@jeevanraksha.in</p></div>
+    </div>
+    <div class="footer-bottom"><p>© 2025 Jeevan Raksha Hospital</p></div>
+  </footer>
+
+  <script>
+    const btn = document.getElementById("profileBtn");
+    const menu = document.getElementById("dropdownMenu");
+    if (btn) { btn.addEventListener("click", e => { e.stopPropagation(); menu.style.display = menu.style.display === "block" ? "none" : "block"; }); }
+    document.addEventListener("click", () => { if (menu) menu.style.display = "none"; });
+  </script>
+</body>
+</html>

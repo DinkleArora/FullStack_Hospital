@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Book a Bed – Jeevan Raksha</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/footer.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .page-section { padding: 50px 20px; display: flex; justify-content: center; min-height: calc(100vh - 100px); }
+    .form-container { width: 100%; max-width: 600px; background: var(--card); padding: 40px; border-radius: 14px; border: 1px solid rgba(167,139,250,0.3); box-shadow: 0 4px 30px rgba(0,0,0,0.5); }
+    .form-container h2 { text-align: center; color: #a78bfa; margin-bottom: 28px; font-size: 1.6em; border-bottom: 2px solid rgba(167,139,250,0.25); padding-bottom: 14px; }
+    .form-row { margin-bottom: 16px; }
+    .form-row label { display: block; margin-bottom: 6px; font-weight: 500; color: #e6eef6; font-size: .93em; }
+    .form-row input, .form-row select, .form-row textarea {
+      width: 100%; padding: 11px 14px; border-radius: 8px; border: 1px solid #334e7a;
+      background: #0f1724; color: #e6eef6; font-size: .93em; box-sizing: border-box;
+    }
+    .form-row input:focus, .form-row select:focus, .form-row textarea:focus { outline: none; border-color: #a78bfa; box-shadow: 0 0 0 2px rgba(167,139,250,0.2); }
+    .ward-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 6px; }
+    .ward-card { padding: 14px 10px; border-radius: 10px; border: 2px solid rgba(167,139,250,0.2); background: #0f1724; cursor: pointer; text-align: center; transition: all .15s; }
+    .ward-card:hover { border-color: #a78bfa; }
+    .ward-card.selected { border-color: #a78bfa; background: rgba(167,139,250,0.15); }
+    .ward-card i { font-size: 1.6em; color: #a78bfa; margin-bottom: 6px; }
+    .ward-card h4 { margin: 0 0 4px 0; font-size: .88em; color: #e6eef6; }
+    .ward-card p { margin: 0; font-size: .75em; color: #8aa0c0; }
+    .btn-submit { background: linear-gradient(135deg, #7c3aed, #6d28d9); padding: 13px; border: none; color: white; border-radius: 8px; width: 100%; cursor: pointer; font-size: 1em; font-weight: 700; margin-top: 8px; }
+    .btn-submit:hover { opacity: .9; }
+    .alert { padding: 12px 16px; border-radius: 8px; margin-top: 16px; font-weight: 500; }
+    .alert-success { background: rgba(74,222,128,0.1); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
+    .alert-danger { background: rgba(248,113,113,0.1); color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
+    .avail-info { display: flex; gap: 14px; margin-bottom: 20px; flex-wrap: wrap; }
+    .avail-badge { display: flex; align-items: center; gap: 6px; background: rgba(58,123,255,0.1); border: 1px solid rgba(58,123,255,0.2); border-radius: 8px; padding: 8px 14px; font-size: .85em; color: #e6eef6; }
+    .avail-badge .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-green { background: #4ade80; }
+    .dot-yellow { background: #fbbf24; }
+    .dot-red { background: #f87171; }
+  </style>
+</head>
+<body>
+  <header class="main-header">
+    <div class="logo-section">
+      <i class="fas fa-heartbeat logo-icon"></i>
+      <h1>Jeevan Raksha</h1>
+    </div>
+    <nav class="center-nav">
+      <a href="/home">Home</a>
+      <a href="/about">About</a>
+      <a href="/doctors">Doctors</a>
+      <a href="#footer">Contact</a>
+    </nav>
+    <div class="nav-right">
+      <% if (session && session.user) { %>
+        <div class="profile-dropdown">
+          <button class="profile-btn" id="profileBtn">
+            <i class="fa fa-user-circle"></i>
+            <span><%= session.user.name %></span>
+            <i class="fa fa-caret-down"></i>
+          </button>
+          <div class="dropdown-menu" id="dropdownMenu">
+            <a href="/patient/dashboard">My Dashboard</a>
+            <a href="/logout">Logout</a>
+          </div>
+        </div>
+      <% } else { %>
+        <a href="/login" class="login-btn">Login</a>
+      <% } %>
+    </div>
+  </header>
+
+  <section class="page-section">
+    <div class="form-container">
+      <h2><i class="fas fa-bed"></i> Book a Hospital Bed</h2>
+
+      <!-- Availability summary -->
+      <div class="avail-info">
+        <div class="avail-badge"><span class="dot dot-green"></span> General: <%= bedStats.general %> available</div>
+        <div class="avail-badge"><span class="dot dot-yellow"></span> Private: <%= bedStats.private %> available</div>
+        <div class="avail-badge"><span class="dot dot-red"></span> ICU: <%= bedStats.icu %> available</div>
+      </div>
+
+      <form action="/patient/book-bed" method="POST">
+        <div class="form-row">
+          <label>Patient Name</label>
+          <input type="text" name="patientName" value="<%= patient.patientName %>" readonly>
+        </div>
+
+        <div class="form-row">
+          <label>Patient ID</label>
+          <input type="text" name="patientId" value="<%= patient.patientId %>" readonly>
+        </div>
+
+        <div class="form-row">
+          <label>Phone Number *</label>
+          <input type="tel" name="phone" placeholder="+91 XXXXX XXXXX" required>
+        </div>
+
+        <div class="form-row">
+          <label>Ward / Bed Type *</label>
+          <div class="ward-cards">
+            <div class="ward-card" onclick="selectWard('General', this)">
+              <i class="fas fa-hospital-user"></i>
+              <h4>General</h4>
+              <p>Shared ward</p>
+            </div>
+            <div class="ward-card" onclick="selectWard('Private', this)">
+              <i class="fas fa-door-closed"></i>
+              <h4>Private</h4>
+              <p>Single room</p>
+            </div>
+            <div class="ward-card" onclick="selectWard('ICU', this)">
+              <i class="fas fa-procedures"></i>
+              <h4>ICU</h4>
+              <p>Critical care</p>
+            </div>
+          </div>
+          <input type="hidden" name="wardType" id="wardType" required>
+        </div>
+
+        <div class="form-row">
+          <label>Preferred Admission Date *</label>
+          <input type="date" name="preferredDate" required min="<%= new Date().toISOString().split('T')[0] %>">
+        </div>
+
+        <div class="form-row">
+          <label>Reason / Medical Condition</label>
+          <textarea name="reason" rows="3" placeholder="Briefly describe the medical reason for bed request..."></textarea>
+        </div>
+
+        <button type="submit" class="btn-submit"><i class="fas fa-check-circle"></i> Submit Bed Request</button>
+      </form>
+
+      <% if (msg) { %>
+        <div class="alert alert-success"><i class="fas fa-check-circle"></i> <%= msg %></div>
+      <% } %>
+      <% if (errorMsg) { %>
+        <div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> <%= errorMsg %></div>
+      <% } %>
+    </div>
+  </section>
+
+  <footer id="footer" class="footer">
+    <div class="footer-container">
+      <div class="footer-section about">
+        <h3>Jeevan Raksha</h3>
+        <p>Delivering trusted, advanced, and compassionate healthcare since 1995.</p>
+        <p class="emergency"><b>Emergency Helpline:</b> <span>+91 108 / +91 98765 43210</span></p>
+      </div>
+      <div class="footer-section"><h4>Quick Links</h4><ul><li><a href="/home">Home</a></li><li><a href="/patient/dashboard">Dashboard</a></li></ul></div>
+      <div class="footer-section"><h4>Contact Us</h4><p>📞 +91 98765 43210</p></div>
+    </div>
+    <div class="footer-bottom"><p>© 2025 Jeevan Raksha Hospital</p></div>
+  </footer>
+
+  <script>
+    const btn = document.getElementById("profileBtn");
+    const menu = document.getElementById("dropdownMenu");
+    if (btn) { btn.addEventListener("click", e => { e.stopPropagation(); menu.style.display = menu.style.display === "block" ? "none" : "block"; }); }
+    document.addEventListener("click", () => { if (menu) menu.style.display = "none"; });
+
+    function selectWard(type, el) {
+      document.querySelectorAll(".ward-card").forEach(c => c.classList.remove("selected"));
+      el.classList.add("selected");
+      document.getElementById("wardType").value = type;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin: Edit Lab Test</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/footer.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <style>
+    /* --- THEME VARIABLES (Copied from admin/lab-tests.ejs) --- */
+    /* --- MAIN CONTENT & CONTAINER (Using 'booking-section' classes for style reuse) --- */
+    .booking-section {
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start; /* Align to top instead of center */
+      min-height: calc(100vh - 65px);
+    }
+
+    .booking-container {
+      width: 100%;
+      max-width: 600px; /* Slightly smaller width appropriate for a single form */
+      background: var(--card);
+      padding: 40px;
+      border-radius: 12px;
+      border: 1px solid rgba(58, 123, 255, 0.3);
+      box-shadow: 0 4px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    .booking-container h2 {
+      text-align: left;
+      color: var(--accent);
+      margin-bottom: 30px;
+      font-size: 28px;
+      border-bottom: 2px solid rgba(58, 123, 255, 0.3);
+      padding-bottom: 10px;
+    }
+    
+    /* --- FORM STYLES --- */
+    .edit-form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .edit-form label {
+      display: block;
+      margin-bottom: 5px;
+      margin-top: 5px;
+      font-weight: 500;
+      color: var(--text-light);
+    }
+
+    .edit-form input,
+    .edit-form select,
+    .edit-form textarea {
+      width: 100%;
+      padding: 12px;
+      border-radius: 6px;
+      border: 1px solid #334e7a;
+      background: var(--input-bg);
+      color: var(--text-light);
+      transition: border-color 0.3s;
+      box-sizing: border-box; /* Include padding in width */
+    }
+
+    .edit-form input:focus,
+    .edit-form select:focus,
+    .edit-form textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 5px rgba(58, 123, 255, 0.5);
+    }
+
+    /* Fix select box visibility (like in admin/lab-tests.ejs) */
+    .edit-form select {
+      color: #000000;
+      background-color: #ffffff;
+    }
+    .edit-form select option {
+        color: #000000;
+        background-color: #ffffff;
+    }
+
+    /* --- BUTTON STYLES --- */
+    .btn {
+      background: var(--accent);
+      padding: 12px 20px;
+      border: none;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      text-align: center;
+      text-decoration: none;
+      display: block; /* Make button full width */
+      width: 100%;
+      margin-top: 20px;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    .btn:hover {
+      background: #2a68e6;
+    }
+
+    /* Alert styles if needed */
+    .alert {
+        padding: 15px;
+        border-radius: 6px;
+        margin-top: 20px;
+        font-weight: 600;
+        text-align: center;
+        border: 1px solid transparent;
+        margin-bottom: 20px;
+    }
+    .alert.success {
+        background-color: rgba(40, 167, 69, 0.2);
+        color: var(--success);
+        border-color: var(--success);
+    }
+    .alert.error {
+        background-color: rgba(220, 53, 69, 0.2);
+        color: var(--danger);
+        border-color: var(--danger);
+    }
+
+    /* Back button style */
+    .back-link {
+        color: var(--text-light);
+        text-decoration: none;
+        display: inline-block;
+        margin-bottom: 15px;
+        font-size: 14px;
+        transition: color 0.3s;
+    }
+    .back-link:hover {
+        color: var(--accent);
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <!-- Header -->
+  <header class="main-header">
+  <div class="logo-section">
+    <i class="fas fa-heartbeat logo-icon"></i>
+    <h1>Jeevan Raksha</h1>
+  </div>
+  <nav class="center-nav">
+  <a href="/admin">Home</a>
+  <a href="/about">About</a>
+  <a href="/doctors">Doctors</a>
+  <a href="#footer">Contact</a>
+</nav>
+<div class="nav-right">
+  <% if (session && session.user) { %>
+    <!-- PROFILE DROPDOWN -->
+    <div class="profile-dropdown">
+      <button class="profile-btn" id="profileBtn">
+        <i class="fa fa-user-circle"></i>
+        <span><%= session.user.name %></span>
+        <i class="fa fa-caret-down"></i>
+      </button>
+
+      <div class="dropdown-menu" id="dropdownMenu">
+        <a href="/logout">Logout</a>
+      </div>
+    </div>
+
+  <% } else { %>
+    <a href="/login" class="login-btn">Login</a>
+  <% } %>
+</div>
+</header>
+
+<section class="booking-section">
+<div class="booking-container">
+
+  <a href="/admin/lab-tests" class="back-link"><i class="fas fa-arrow-left"></i> Back to Lab Tests</a>
+
+  <h2>Edit Lab Test: <%= typeof test !== 'undefined' ? test.name : 'Unknown Test' %></h2>
+
+ 
+
+  <form action="/admin/lab-tests/update/<%= test._id %>" method="POST" class="edit-form">
+
+    <label>Test Name</label>
+    <input type="text" name="name" value="<%= typeof test !== 'undefined' ? test.name : '' %>" required>
+
+    <label>Category</label>
+    <select name="category" required>
+        <option value="Blood Test" <%= typeof test !== 'undefined' && test.category === "Blood Test" ? "selected" : "" %>>Blood Test</option>
+        <option value="Hormone" <%= typeof test !== 'undefined' && test.category === "Hormone" ? "selected" : "" %>>Hormone</option>
+        <option value="Imaging" <%= typeof test !== 'undefined' && test.category === "Imaging" ? "selected" : "" %>>Imaging</option>
+        <option value="Vitamin" <%= typeof test !== 'undefined' && test.category === "Vitamin" ? "selected" : "" %>>Vitamin</option>
+        <option value="Infection" <%= typeof test !== 'undefined' && test.category === "Infection" ? "selected" : "" %>>Infection</option>
+    </select>
+
+    <label>Price (₹)</label>
+    <input type="number" name="price" value="<%= typeof test !== 'undefined' ? test.price : '' %>" required>
+
+    <label>Description</label>
+    <textarea name="description" rows="5"><%= typeof test !== 'undefined' ? test.description : '' %></textarea>
+
+    <button type="submit" class="btn"><i class="fas fa-save"></i> Update Test Details</button>
+
+    <!-- Optional: Link back to the main list -->
+    <a href="/admin/lab-tests" class="btn secondary" style="background: #334e7a; margin-top: 10px; width: 94%;"><i class="fas fa-times-circle"></i> Cancel</a>
+
+</form>
+
+</div>
+</section>
+<!-- Footer Section -->
+  <footer id="footer" class="footer">
+
+  <div class="footer-container">
+
+    <!-- About Section -->
+    <div class="footer-section about">
+      <h3>Jeevan Raksha </h3>
+      <p>Delivering trusted, advanced, and compassionate healthcare since 1995.</p>
+      <p class="emergency"><b>Emergency Helpline:</b> <span>+91 108 / +91 98765 43210</span></p>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="footer-section">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="/admin">Home</a></li>
+        <li><a href="/about">About Us</a></li>
+        <li><a href="/doctors">Doctors</a></li>
+        <li><a href="#footer">Contact</a></li>
+      </ul>
+    </div>
+
+    <!-- Patient Services -->
+    <div class="footer-section">
+      <h4>Patient Services</h4>
+      <ul>
+        <li><a href="/admin/manage-bookings">Manage Bookings</a></li>
+        <li><a href="/admin/lab-tests">Lab Test</a></li>
+        <li><a href="/reports">Upload Reports</a></li>
+        <li><a href="/faq">FAQs</a></li>
+      </ul>
+    </div>
+
+    <!-- Contact Section -->
+    <div class="footer-section">
+      <h4>Contact Us</h4>
+      <p>📍 21, Health Street, Jaipur, Rajasthan, India</p>
+      <p>📞 +91 98765 43210</p>
+      <p>✉️ contact@jeevanraksha.in</p>
+    </div>
+
+    <!-- Social Section -->
+    <div class="footer-section">
+      <h4>Follow Us</h4>
+    <div class="social-icons">
+      <a href="#"><i class="fab fa-facebook"></i></a>
+      <a href="#"><i class="fab fa-instagram"></i></a>
+      <a href="#"><i class="fab fa-twitter"></i></a>
+      <a href="#"><i class="fab fa-linkedin"></i></a>
+      <a href="#"><i class="fab fa-youtube"></i></a>
+    </div>
+    </div>
+
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 Jeevan Raksha Hospital • Secure | Smart | Live Health Insights</p>
+  </div>
+
+</footer>
+<script>
+const btn = document.getElementById("profileBtn");
+const menu = document.getElementById("dropdownMenu");
+
+// When the profile button is clicked
+if (btn) {
+  btn.addEventListener("click", function (event) {
+    event.stopPropagation();
+    menu.style.display =
+      menu.style.display === "block" ? "none" : "block";
+  });
+}
+
+// Close dropdown when clicking anywhere on screen
+document.addEventListener("click", function () {
+  if (menu) menu.style.display = "none";
+});
+</script>
+</body>
+</html>

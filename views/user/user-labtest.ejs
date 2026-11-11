@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Lab Tests | Jeevan Raksha</title>
+
+  <link rel="stylesheet" href="./css/style.css">
+  <link rel="stylesheet" href="./css/footer.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <style>
+    body { background:#0c1b33; color:white; }
+    /* Heading Style */
+        .page-header {
+            text-align: center;
+            margin-top: 60px;
+            margin-bottom: 40px;
+            font-size: 30px;
+        }
+
+        /* FIX: GRID CONTAINER SETUP */
+        .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+            
+            /* CRUCIAL: Set gap for both horizontal and vertical spacing */
+            
+            row-gap: 60px;
+
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto; 
+            align-items: stretch; 
+        }
+
+        /* UPDATED CARD STYLE FOR ALIGNMENT AND HEIGHT */
+    .test-card {
+    background:#112345;
+    padding:20px;
+    border-radius:12px;
+    border:1px solid #3a7bff;
+            
+            /* Re-introducing margin-bottom as a fallback for vertical spacing */
+            margin-bottom: 0; /* Removing previous margin */
+            
+            /* Ensure the card fills the grid cell height */
+            height: 100%; 
+            
+            /* Flexbox to push button to the bottom */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; 
+        }
+        
+        /* Content wrapper to absorb space */
+        .test-content {
+            flex-grow: 1; 
+            margin-bottom: 15px; 
+            height: 100%; 
+        }
+    .btn {
+    background:#3a7bff;
+    color:white;
+    padding:8px 14px;
+    border-radius:6px;
+    text-decoration:none;
+    align-self: flex-start; 
+    }
+</style>
+</head>
+
+<body>
+    <header class="main-header">
+    <div class="logo-section">
+      <i class="fas fa-heartbeat logo-icon"></i>
+      <h1>Jeevan Raksha</h1>
+    </div>
+  <nav class="center-nav">
+  <a href="/home">Home</a>
+  <a href="/about">About</a>
+  <a href="/doctors">Doctors</a>
+  <a href="#footer">Contact</a>
+</nav>
+
+<div class="nav-right">
+  <% if (session && session.user) { %>
+        <div class="profile-dropdown">
+      <button class="profile-btn" id="profileBtn">
+        <i class="fa fa-user-circle"></i>
+        <span><%= session.user.name %></span>
+        <i class="fa fa-caret-down"></i>
+      </button>
+
+      <div class="dropdown-menu" id="dropdownMenu">
+        <a href="/logout">Logout</a>
+      </div>
+    </div>
+
+  <% } else { %>
+    <a href="/login" class="login-btn">Login</a>
+  <% } %>
+</div>
+  </header>
+
+<h2 class="page-header">Available Lab Tests</h2>
+
+<div class="container">
+    <% tests.forEach(t => { %>
+        <div class="test-card">
+            <div class="test-content"> 
+                <h3><%= t.name %></h3>
+                <p><b>Category:</b> <%= t.category %></p>
+                <p><b>Price:</b> ₹<%= t.price %></p>
+                <p><%= t.description %></p>
+            </div>
+            <a href="/lab-tests/book/<%= t._id %>" class="btn">Book Test</a>
+        </div>
+    <% }) %>
+</div>
+
+  <footer id="footer" class="footer">
+
+  <div class="footer-container">
+
+        <div class="footer-section about">
+      <h3>Jeevan Raksha </h3>
+      <p>Delivering trusted, advanced, and compassionate healthcare since 1995.</p>
+      <p class="emergency"><b>Emergency Helpline:</b> <span>+91 108 / +91 98765 43210</span></p>
+
+      <h4 style="margin-top: 30px;">Follow Us</h4>
+      <div class="social-icons">
+        <a href="#"><i class="fab fa-facebook"></i></a>
+        <a href="#"><i class="fab fa-instagram"></i></a>
+        <a href="#"><i class="fab fa-twitter"></i></a>
+        <a href="#"><i class="fab fa-linkedin"></i></a>
+        <a href="#"><i class="fab fa-youtube"></i></a>
+      </div>
+    </div>
+
+        <div class="footer-section">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="/home">Home</a></li>
+        <li><a href="/about">About Us</a></li>
+        <li><a href="/doctors">Doctors</a></li>
+        <li><a href="#footer">Contact</a></li>
+      </ul>
+    </div>
+
+        <div class="footer-section">
+      <h4>Patient Services</h4>
+      <ul>
+        <li><a href="/booking">Book Appointment</a></li>
+        <li><a href="/lab-tests">Lab Test Information</a></li>
+        <li><a href="/reports">Download Reports</a></li>
+        <li><a href="/faq">FAQs</a></li>
+      </ul>
+    </div>
+
+        <div class="footer-section">
+      <h4>Contact Us</h4>
+      <p>📍 21, Health Street, Jaipur, Rajasthan, India</p>
+      <p>📞 +91 98765 43210</p>
+      <p>✉️ contact@jeevanraksha.in</p>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>© 2025 Jeevan Raksha Hospital • Secure | Smart | Live Health Insights</p>
+  </div>
+
+</footer>
+<script>
+const btn = document.getElementById("profileBtn");
+const menu = document.getElementById("dropdownMenu");
+
+// When the profile button is clicked
+if (btn) {
+  btn.addEventListener("click", function (event) {
+    event.stopPropagation();
+    menu.style.display =
+      menu.style.display === "block" ? "none" : "block";
+  });
+}
+
+// Close dropdown when clicking anywhere on screen
+document.addEventListener("click", function () {
+  if (menu) menu.style.display = "none";
+});
+</script>
+</body>
+</html>

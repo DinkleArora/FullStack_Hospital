@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sign Up</title>
+  <link rel="stylesheet" href="/css/login.css" />
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+<!--main content-->
+  <div class="login-container">
+    <h2>Create Account</h2>
+
+    <form id="signupForm" novalidate action="/signup" method="POST">
+
+      <!-- Role Selection -->
+      <select id="role" name="role" required>
+        <option value="">-- Select Role --</option>
+        <option value="patient">Patient</option>
+        <option value="admin">Admin</option>
+      </select>
+
+      <!-- Dynamically changes name to patientId or adminId -->
+      <input type="text" id="dynamicId" name="userId" placeholder="Enter ID (Patient/Admin)" required />
+
+      <input type="text" name="userName" placeholder="Enter Name" required />
+
+      <input type="password" id="password" name="password" placeholder="Create Password" required />
+
+      <button type="submit" class="btn">Sign Up</button>
+
+      <% if (errorMsg) { %>
+        <div class="error"><%= errorMsg %></div>
+      <% } %>
+
+      <% if (successMsg) { %>
+        <div class="success"><%= successMsg %></div>
+      <% } %>
+
+    </form>
+
+    <p>Already have an account?
+      <a href="/login">Login</a>
+    </p>
+  </div>
+x
+
+  <!-- Password validation JS -->
+  <script>
+    function validatePassword(password) {
+      const hasUpper = /[A-Z]/.test(password);
+      const hasSymbol = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+      const hasLength = password.length >= 8;
+      return hasUpper && hasSymbol && hasLength;
+    }
+
+    document.getElementById("signupForm").addEventListener("submit", function (e) {
+      const password = document.getElementById("password").value;
+      if (!validatePassword(password)) {
+        e.preventDefault();
+        alert("Password must include:\n✔ 1 uppercase letter\n✔ 1 symbol\n✔ minimum 8 characters");
+      }
+    });
+
+    // Change placeholder based on role
+    document.getElementById("role").addEventListener("change", function () {
+      const role = this.value;
+      const idInput = document.getElementById("dynamicId");
+
+      if (role === "admin") {
+        idInput.placeholder = "Enter Admin ID";
+      } else if (role === "patient") {
+        idInput.placeholder = "Enter Patient ID";
+      } else {
+        idInput.placeholder = "Enter ID (Patient/Admin)";
+      }
+    });
+  </script>
+
+</body>
+</html>

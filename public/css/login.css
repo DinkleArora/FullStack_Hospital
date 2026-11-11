@@ -1,0 +1,89 @@
+/* login.css */
+* {
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+body {
+  margin: 0;
+  background: linear-gradient(135deg, #1e1f29, #4a90e2);
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+}
+.login-container {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  padding: 40px 35px;
+  border-radius: 20px;
+  width: 350px;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+#role {
+    width: 100%;
+    padding: 12px;                       /* same as input */
+    margin-bottom: 15px;
+    border: none;
+    border-radius: 10px;
+    outline: none;
+    font-size: 16px;
+    background: white;                   /* readable text */
+    color: #333;                         /* dark text for contrast */
+    transition: 0.3s ease;
+    appearance: none;                    /* remove default arrow */
+    cursor: pointer;
+}
+
+/* Add custom dropdown arrow */
+#role {
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg width='16' height='16' fill='%23333' viewBox='0 0 16 16'%3E%3Cpath d='M4 6l4 4 4-4'/ %3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+}
+
+
+
+
+h2 {
+  margin-bottom: 25px;
+}
+input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: none;
+  border-radius: 10px;
+  outline: none;
+  font-size: 16px;
+}
+.btn {
+  width: 100%;
+  padding: 12px;
+  background: #4a90e2;
+  border: none;
+  color: white;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.btn:hover {
+  background: #6b42f4;
+}
+.error {
+  color: #ff8888;
+  font-size: 14px;
+  margin-top: 8px;
+  /* display: none; */
+}
+p a {
+  color: #bfe1ff;
+  text-decoration: none;
+  cursor: pointer;
+}
+p a:hover {
+  text-decoration: underline;
+}

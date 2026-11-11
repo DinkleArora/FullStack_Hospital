@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Request Ambulance – Jeevan Raksha</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/footer.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .page-container { padding: 40px 20px; max-width: 700px; margin: 0 auto; }
+    h2.page-title { color: var(--accent); text-align: center; margin-bottom: 30px; font-size: 2em; border-bottom: 2px solid rgba(58,123,255,0.3); padding-bottom: 10px; }
+    .amb-card { background: var(--card); border: 1px solid rgba(58,123,255,0.3); border-radius: 14px; padding: 32px; }
+    .amb-card p { color: var(--muted); margin-bottom: 24px; font-size: .97em; line-height: 1.6; }
+    .amb-card label { display: block; margin-bottom: 6px; font-size: .9em; color: #bcd; }
+    .amb-card input, .amb-card select, .amb-card textarea { background: #0f1724; border: 1px solid rgba(58,123,255,.3); color: #e6eef6; padding: 10px 12px; border-radius: 8px; font-size: 14px; width: 100%; margin-bottom: 16px; }
+    .amb-card textarea { resize: vertical; min-height: 80px; }
+    .btn-request { background: #dc3545; color: white; border: none; padding: 12px 32px; border-radius: 10px; font-size: 1em; cursor: pointer; font-weight: 600; width: 100%; transition: opacity .2s; }
+    .btn-request:hover { opacity: .85; }
+    .msg-success { color: #4ade80; background: rgba(74,222,128,.1); padding: 10px 16px; border-radius: 8px; margin-bottom: 16px; }
+    .msg-error { color: #f87171; background: rgba(248,113,113,.1); padding: 10px 16px; border-radius: 8px; margin-bottom: 16px; }
+    .emergency-banner { background: rgba(220,53,69,.12); border: 1px solid rgba(220,53,69,.4); border-radius: 10px; padding: 14px 18px; margin-bottom: 24px; color: #f87171; font-weight: 600; text-align: center; }
+    .emergency-banner i { margin-right: 8px; }
+  </style>
+</head>
+<body>
+  <header class="main-header">
+    <div class="logo-section">
+      <i class="fas fa-heartbeat logo-icon"></i>
+      <h1>Jeevan Raksha</h1>
+    </div>
+    <nav class="center-nav">
+      <a href="/home">Home</a>
+      <a href="/about">About</a>
+      <a href="/doctors">Doctors</a>
+      <a href="#footer">Contact</a>
+    </nav>
+    <div class="nav-right">
+      <% if (session && session.user) { %>
+        <div class="profile-dropdown">
+          <button class="profile-btn" id="profileBtn">
+            <i class="fa fa-user-circle"></i>
+            <span><%= session.user.name %></span>
+            <i class="fa fa-caret-down"></i>
+          </button>
+          <div class="dropdown-menu" id="dropdownMenu">
+            <a href="/patient/dashboard">My Dashboard</a>
+            <a href="/logout">Logout</a>
+          </div>
+        </div>
+      <% } else { %>
+        <a href="/login" class="login-btn">Login</a>
+      <% } %>
+    </div>
+  </header>
+
+  <main class="page-container">
+    <h2 class="page-title"><i class="fas fa-ambulance"></i> Request Ambulance</h2>
+
+    <% if (msg) { %><div class="msg-success"><%= msg %></div><% } %>
+    <% if (errorMsg) { %><div class="msg-error"><%= errorMsg %></div><% } %>
+
+    <div class="emergency-banner">
+      <i class="fas fa-exclamation-triangle"></i>
+      For life-threatening emergencies call <strong>+91 108</strong> directly.
+    </div>
+
+    <div class="amb-card">
+      <p>Fill in the form below to request an available ambulance. Our team will dispatch the nearest unit to your location.</p>
+      <form action="/patient/request-ambulance" method="POST">
+        <label>Patient ID</label>
+        <input type="text" name="patientId" value="<%= session && session.user ? session.user.id : '' %>" readonly />
+        <label>Pickup Address</label>
+        <input type="text" name="pickupAddress" placeholder="Enter your full address" required />
+        <label>Emergency Details</label>
+        <textarea name="emergencyDetails" placeholder="Describe the emergency briefly..."></textarea>
+        <label>Contact Phone</label>
+        <input type="tel" name="phone" placeholder="+91 XXXXXXXXXX" required />
+        <button type="submit" class="btn-request"><i class="fas fa-ambulance"></i> Request Ambulance Now</button>
+      </form>
+    </div>
+  </main>
+
+  <footer id="footer" class="footer">
+    <div class="footer-container">
+      <div class="footer-section about">
+        <h3>Jeevan Raksha</h3>
+        <p>Delivering trusted, advanced, and compassionate healthcare since 1995.</p>
+        <p class="emergency"><b>Emergency Helpline:</b> <span>+91 108 / +91 98765 43210</span></p>
+      </div>
+      <div class="footer-section">
+        <h4>Patient Services</h4>
+        <ul>
+          <li><a href="/booking">Book Appointment</a></li>
+          <li><a href="/lab-tests">Lab Tests</a></li>
+          <li><a href="/patient/dashboard">My Dashboard</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4>Contact Us</h4>
+        <p>📍 21, Health Street, Jaipur, Rajasthan, India</p>
+        <p>📞 +91 98765 43210</p>
+        <p>✉️ contact@jeevanraksha.in</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 Jeevan Raksha Hospital • Secure | Smart | Live Health Insights</p>
+    </div>
+  </footer>
+
+  <script>
+    const btn = document.getElementById("profileBtn");
+    const menu = document.getElementById("dropdownMenu");
+    if (btn) btn.addEventListener("click", e => { e.stopPropagation(); menu.style.display = menu.style.display === "block" ? "none" : "block"; });
+    document.addEventListener("click", () => { if (menu) menu.style.display = "none"; });
+  </script>
+</body>
+</html>

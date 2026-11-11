@@ -1,0 +1,102 @@
+/* ===== Appointment Section Center Rectangle ===== */
+.booking-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  background: linear-gradient(135deg, #e0f2fe, #f1f5f9);
+  padding: 40px 0;
+}
+
+.booking-container {
+  background: #ffffff;
+  width: 90%;
+  max-width: 650px;
+  padding: 40px 50px;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  animation: fadeInUp 0.6s ease;
+}
+
+.booking-container h2 {
+  text-align: center;
+  margin-bottom: 24px;
+  color: #1e40af;
+  font-size: 1.8rem;
+}
+
+/* Form Styling */
+.booking-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-row label {
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.form-row input,
+.form-row select,
+.form-row textarea {
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  outline: none;
+  font-size: 0.95rem;
+  transition: 0.2s;
+}
+
+.form-row input:focus,
+.form-row select:focus,
+.form-row textarea:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 6px rgba(59, 130, 246, 0.3);
+}
+
+/* Button */
+.booking-form .btn {
+  align-self: center;
+  width: 200px;
+  background: #2563eb;
+  color: white;
+  font-weight: 600;
+  border: none;
+  padding: 12px 0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.booking-form .btn:hover {
+  background: #1e40af;
+}
+
+/* Animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* Add this to a general stylesheet if possible to catch option elements */
+.form-row select option {
+    color: #1e293b;
+    background-color: #ffffff;
+}/* Fix for Select Box Text and Options Visibility in all themes */
+.form-row select {
+    /* ... existing styles ... */
+    color: #1e293b !important; /* Forces dark text color */
+    background-color: #ffffff !important; /* Ensures white background */
+}

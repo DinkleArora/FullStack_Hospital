@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin | Manage Lab Tests</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+    body { background-color:#0c1b33; color:#fff; }
+    .card { background-color:#112345; padding:25px; margin-top:110px; border-radius:12px; }
+    .btn-add { background-color:#3a7bff; color:#fff; }
+    .btn-del { background-color:red; color:#fff; }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="card">
+        <h2>Manage Lab Tests</h2>
+
+        <hr>
+
+        <h4>Add New Test</h4>
+
+        <input class="form-control mb-2" id="tname" placeholder="Test Name">
+        <input class="form-control mb-2" id="tdesc" placeholder="Description">
+        <input class="form-control mb-2" id="tprep" placeholder="Preparation">
+        <input class="form-control mb-2" id="ttime" placeholder="Turnaround Time">
+        <input class="form-control mb-2" id="tcost" placeholder="Cost">
+
+        <button class="btn-add" onclick="addTest()">Add Test</button>
+
+        <hr>
+
+        <h4>All Tests</h4>
+        <div id="testList"></div>
+    </div>
+</div>
+
+<script>
+let tests = [];
+
+fetch("lab_tests.json")
+    .then(res => res.json())
+    .then(data => {
+        tests = data;
+        displayTests();
+    });
+
+function displayTests() {
+    let html = "";
+    tests.forEach((t, index) => {
+        html += `
+            <div class="border p-2 mb-2 rounded">
+                <b>${t.name}</b> - ${t.turnaround} - ${t.cost}
+                <button class="btn btn-sm btn-del float-end" onclick="deleteTest(${index})">Delete</button>
+            </div>`;
+    });
+    document.getElementById("testList").innerHTML = html;
+}
+
+function addTest() {
+    const test = {
+        test_id: "T" + String(tests.length + 1).padStart(3, "0"),
+        name: document.getElementById("tname").value,
+        description: document.getElementById("tdesc").value,
+        preparation: document.getElementById("tprep").value,
+        turnaround: document.getElementById("ttime").value,
+        cost: document.getElementById("tcost").value
+    };
+
+    tests.push(test);
+    displayTests();
+
+    alert("Test added successfully!");
+}
+
+function deleteTest(i) {
+    tests.splice(i, 1);
+    displayTests();
+}
+</script>
+
+</body>
+</html>

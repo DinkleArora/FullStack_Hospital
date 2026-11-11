@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login</title>
+  <link rel="stylesheet" href="./css/login.css" />
+</head>
+
+<body>
+  <div class="login-container">
+    <h2>Login</h2>
+
+    <form id="loginForm" novalidate action="/login" method="POST">
+
+      <!-- Role Dropdown -->
+      <select name="role" id="role" class="login-select" required>
+        <option value="">-- Select Role --</option>
+        <option value="patient">Patient</option>
+        <option value="admin">Admin</option>
+      </select>
+
+      <!-- Dynamic User ID Field -->
+      <input type="text" id="userId" name="userId" placeholder="Enter ID (Patient/Admin)" required />
+
+      <input type="text" name="userName" placeholder="Enter Name" required />
+      <!-- Password -->
+      <input type="password" id="password" name="password" placeholder="Enter Password" required />
+      <button type="submit" class="btn">Login</button>
+      <% if (errorMsg) { %>
+        <div class="error" id="errorMsg"><%= errorMsg %></div>
+      <% } %>
+
+    </form>
+
+    <p>Don't have an account? <a href="/signup">Sign Up</a></p>
+  </div>
+
+  <!-- Password Check -->
+  <script>
+    function validatePassword(password) {
+      const hasUpper = /[A-Z]/.test(password);
+      const hasSymbol = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+      const hasLength = password.length >= 8;
+      return hasUpper && hasSymbol && hasLength;
+    }
+
+    // Auto-update placeholder based on role
+    document.getElementById("role").addEventListener("change", function () {
+      const role = this.value;
+      const idField = document.getElementById("userId");
+
+      if (role === "patient") {
+        idField.placeholder = "Enter Patient ID";
+      } else if (role === "admin") {
+        idField.placeholder = "Enter Admin ID";
+      } else {
+        idField.placeholder = "Enter ID (Patient/Admin)";
+      }
+    });
+
+    // Validate password before login
+    document.addEventListener("DOMContentLoaded", function () {
+      const form = document.getElementById("loginForm");
+      const passwordInput = document.getElementById("password");
+
+      form.addEventListener("submit", function (e) {
+        const password = passwordInput.value;
+
+        if (!validatePassword(password)) {
+          e.preventDefault();
+          alert("Password must contain:\n- 8 characters\n- 1 uppercase letter\n- 1 symbol");
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>

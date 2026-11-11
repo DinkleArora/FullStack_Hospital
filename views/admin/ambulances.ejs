@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Manage Ambulances – Jeevan Raksha</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/footer.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .admin-container { padding: 40px 20px; max-width: 1100px; margin: 0 auto; }
+    h2.page-title { color: var(--accent); text-align: center; margin-bottom: 30px; font-size: 2em; border-bottom: 2px solid rgba(58,123,255,0.3); padding-bottom: 10px; }
+    .form-card { background: var(--card); border: 1px solid rgba(58,123,255,0.3); border-radius: 12px; padding: 28px; margin-bottom: 36px; }
+    .form-card h3 { color: var(--accent); margin-top: 0; }
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; }
+    .form-grid input { background: #0f1724; border: 1px solid rgba(58,123,255,0.3); color: #e6eef6; padding: 10px 12px; border-radius: 8px; font-size: 14px; width: 100%; }
+    .btn-add { margin-top: 16px; background: var(--accent); color: white; border: none; padding: 10px 28px; border-radius: 8px; font-size: 14px; cursor: pointer; transition: opacity .2s; }
+    .btn-add:hover { opacity: .8; }
+    .msg-success { color: #4ade80; background: rgba(74,222,128,.1); padding: 10px 16px; border-radius: 8px; margin-bottom: 16px; }
+    .msg-error { color: #f87171; background: rgba(248,113,113,.1); padding: 10px 16px; border-radius: 8px; margin-bottom: 16px; }
+    .table-container { overflow-x: auto; background: var(--card); border-radius: 12px; border: 1px solid rgba(58,123,255,0.3); }
+    .amb-table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 700px; }
+    .amb-table th, .amb-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .amb-table th { background: #1a3461; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+    .badge-avail { background: rgba(74,222,128,.15); color: #4ade80; padding: 3px 10px; border-radius: 20px; font-size: .82em; font-weight: 700; }
+    .badge-busy { background: rgba(248,113,113,.15); color: #f87171; padding: 3px 10px; border-radius: 20px; font-size: .82em; font-weight: 700; }
+    .action-btns form { display: inline; }
+    .btn-dispatch { background: #3a7bff; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: .85em; }
+    .btn-return { background: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: .85em; }
+    .btn-del { background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: .85em; }
+    .btn-dispatch:hover, .btn-return:hover, .btn-del:hover { opacity: .8; }
+    .inline-input { background: #0f1724; border: 1px solid rgba(58,123,255,.3); color: #e6eef6; padding: 4px 8px; border-radius: 6px; font-size: .85em; width: 110px; }
+  </style>
+</head>
+<body>
+  <header class="main-header">
+    <div class="logo-section">
+      <i class="fas fa-heartbeat logo-icon"></i>
+      <h1>Jeevan Raksha</h1>
+    </div>
+    <nav class="center-nav">
+      <a href="/admin">Home</a>
+      <a href="/about">About</a>
+      <a href="/doctors">Doctors</a>
+      <a href="#footer">Contact</a>
+    </nav>
+    <div class="nav-right">
+      <% if (session && session.user) { %>
+        <div class="profile-dropdown">
+          <button class="profile-btn" id="profileBtn">
+            <i class="fa fa-user-circle"></i>
+            <span><%= session.user.name %></span>
+            <i class="fa fa-caret-down"></i>
+          </button>
+          <div class="dropdown-menu" id="dropdownMenu">
+            <a href="/logout">Logout</a>
+          </div>
+        </div>
+      <% } else { %>
+        <a href="/login" class="login-btn">Login</a>
+      <% } %>
+    </div>
+  </header>
+
+  <main class="admin-container">
+    <h2 class="page-title"><i class="fas fa-ambulance"></i> Manage Ambulances</h2>
+
+    <% if (msg) { %><div class="msg-success"><%= msg %></div><% } %>
+    <% if (errorMsg) { %><div class="msg-error"><%= errorMsg %></div><% } %>
+
+    <div class="form-card">
+      <h3>Add New Ambulance</h3>
+      <form action="/admin/ambulances/add" method="POST">
+        <div class="form-grid">
+          <input type="text" name="vehicleNo" placeholder="Vehicle No (e.g. RJ-01-AB-1234)" required />
+          <input type="text" name="driverName" placeholder="Driver Name" required />
+          <input type="text" name="currentLoc" placeholder="Current Location" />
+        </div>
+        <button type="submit" class="btn-add"><i class="fas fa-plus"></i> Add Ambulance</button>
+      </form>
+    </div>
+
+    <div class="table-container">
+      <table class="amb-table">
+        <thead>
+          <tr>
+            <th>Vehicle No</th>
+            <th>Driver</th>
+            <th>Current Location</th>
+            <th>Status</th>
+            <th>Assigned Patient</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (ambulances && ambulances.length > 0) { %>
+            <% ambulances.forEach(a => { %>
+              <tr>
+                <td><%= a.vehicleNo %></td>
+                <td><%= a.driverName %></td>
+                <td><%= a.currentLoc %></td>
+                <td>
+                  <% if (a.isAvailable) { %>
+                    <span class="badge-avail">Available</span>
+                  <% } else { %>
+                    <span class="badge-busy">Dispatched</span>
+                  <% } %>
+                </td>
+                <td><%= a.assignedPatientId || '—' %></td>
+                <td class="action-btns">
+                  <% if (a.isAvailable) { %>
+                    <form action="/admin/ambulances/dispatch/<%= a._id %>" method="POST" style="display:inline;">
+                      <input type="text" name="patientId" class="inline-input" placeholder="Patient ID" required />
+                      <button type="submit" class="btn-dispatch">Dispatch</button>
+                    </form>
+                  <% } else { %>
+                    <form action="/admin/ambulances/return/<%= a._id %>" method="POST" style="display:inline;">
+                      <button type="submit" class="btn-return">Mark Returned</button>
+                    </form>
+                  <% } %>
+                  <form action="/admin/ambulances/delete/<%= a._id %>" method="POST" style="display:inline;">
+                    <button type="submit" class="btn-del" onclick="return confirm('Delete ambulance?')">Delete</button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          <% } else { %>
+            <tr><td colspan="6" style="text-align:center;padding:24px;">No ambulances added yet.</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <footer id="footer" class="footer">
+    <div class="footer-container">
+      <div class="footer-section about">
+        <h3>Jeevan Raksha</h3>
+        <p>Delivering trusted, advanced, and compassionate healthcare since 1995.</p>
+        <p class="emergency"><b>Emergency Helpline:</b> <span>+91 108 / +91 98765 43210</span></p>
+      </div>
+      <div class="footer-section">
+        <h4>Admin Tools</h4>
+        <ul>
+          <li><a href="/admin/manage-bookings">Manage Bookings</a></li>
+          <li><a href="/admin/slots">Manage Slots</a></li>
+          <li><a href="/admin/beds">Manage Beds</a></li>
+          <li><a href="/admin/ambulances">Manage Ambulances</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4>Contact Us</h4>
+        <p>📍 21, Health Street, Jaipur, Rajasthan, India</p>
+        <p>📞 +91 98765 43210</p>
+        <p>✉️ contact@jeevanraksha.in</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 Jeevan Raksha Hospital • Secure | Smart | Live Health Insights</p>
+    </div>
+  </footer>
+
+  <script>
+    const btn = document.getElementById("profileBtn");
+    const menu = document.getElementById("dropdownMenu");
+    if (btn) btn.addEventListener("click", e => { e.stopPropagation(); menu.style.display = menu.style.display === "block" ? "none" : "block"; });
+    document.addEventListener("click", () => { if (menu) menu.style.display = "none"; });
+  </script>
+</body>
+</html>

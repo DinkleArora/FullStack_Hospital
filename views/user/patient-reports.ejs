@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>My Medical Reports – Jeevan Raksha</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/footer.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .page-wrap { padding: 40px 20px; max-width: 1050px; margin: 0 auto; }
+    .page-title { color: var(--accent); text-align: center; font-size: 1.9em; margin-bottom: 8px; }
+    .page-sub { text-align: center; color: #8aa0c0; margin-bottom: 32px; }
+    .filter-bar { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+    .filter-bar select { padding: 9px 14px; border-radius: 8px; border: 1px solid #334e7a; background: #0f1724; color: #e6eef6; font-size: .9em; }
+    .reports-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 18px; }
+    .report-card { background: var(--card); border: 1px solid rgba(52,211,153,0.2); border-radius: 14px; padding: 22px; transition: border-color .2s, transform .2s; position: relative; }
+    .report-card:hover { border-color: #34d399; transform: translateY(-2px); }
+    .report-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4em; margin-bottom: 14px; }
+    .icon-lab { background: rgba(52,211,153,0.1); color: #34d399; }
+    .icon-xray { background: rgba(96,165,250,0.1); color: #60a5fa; }
+    .icon-rx { background: rgba(167,139,250,0.1); color: #a78bfa; }
+    .icon-discharge { background: rgba(251,146,60,0.1); color: #fb923c; }
+    .icon-other { background: rgba(156,163,175,0.1); color: #9ca3af; }
+    .report-card h3 { color: #e6eef6; font-size: 1em; margin: 0 0 6px 0; }
+    .report-meta { font-size: .8em; color: #8aa0c0; margin-bottom: 12px; }
+    .report-meta span { display: block; margin-bottom: 2px; }
+    .report-notes { font-size: .83em; color: #aab8cc; background: rgba(255,255,255,0.04); padding: 8px 10px; border-radius: 6px; margin-bottom: 14px; border-left: 3px solid rgba(52,211,153,0.4); }
+    .badge-type { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: .73em; font-weight: 700; margin-bottom: 8px; }
+    .badge-Lab { background: rgba(52,211,153,0.15); color: #34d399; }
+    .badge-X-Ray { background: rgba(96,165,250,0.15); color: #60a5fa; }
+    .badge-Prescription { background: rgba(167,139,250,0.15); color: #a78bfa; }
+    .badge-Discharge { background: rgba(251,146,60,0.15); color: #fb923c; }
+    .badge-Other { background: rgba(156,163,175,0.15); color: #9ca3af; }
+    .empty-state { text-align: center; padding: 60px 20px; }
+    .empty-state i { font-size: 3.5em; color: rgba(52,211,153,0.3); margin-bottom: 16px; }
+    .empty-state p { color: #8aa0c0; }
+    .date-stamp { position: absolute; top: 16px; right: 16px; font-size: .72em; color: #8aa0c0; }
+  </style>
+</head>
+<body>
+  <header class="main-header">
+    <div class="logo-section">
+      <i class="fas fa-heartbeat logo-icon"></i>
+      <h1>Jeevan Raksha</h1>
+    </div>
+    <nav class="center-nav">
+      <a href="/home">Home</a>
+      <a href="/about">About</a>
+      <a href="/doctors">Doctors</a>
+      <a href="#footer">Contact</a>
+    </nav>
+    <div class="nav-right">
+      <% if (session && session.user) { %>
+        <div class="profile-dropdown">
+          <button class="profile-btn" id="profileBtn">
+            <i class="fa fa-user-circle"></i>
+            <span><%= session.user.name %></span>
+            <i class="fa fa-caret-down"></i>
+          </button>
+          <div class="dropdown-menu" id="dropdownMenu">
+            <a href="/patient/dashboard">My Dashboard</a>
+            <a href="/logout">Logout</a>
+          </div>
+        </div>
+      <% } else { %>
+        <a href="/login" class="login-btn">Login</a>
+      <% } %>
+    </div>
+  </header>
+
+  <main class="page-wrap">
+    <h2 class="page-title"><i class="fas fa-file-medical-alt"></i> My Medical Reports</h2>
+    <p class="page-sub">View all your lab results, prescriptions, X-rays and discharge summaries</p>
+
+    <div class="filter-bar">
+      <select id="filterType" onchange="filterReports()">
+        <option value="">All Report Types</option>
+        <option value="Lab Report">Lab Report</option>
+        <option value="X-Ray">X-Ray</option>
+        <option value="Prescription">Prescription</option>
+        <option value="Discharge Summary">Discharge Summary</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+
+    <% if (reports && reports.length > 0) { %>
+      <div class="reports-grid" id="reportsGrid">
+        <% reports.forEach(r => { %>
+          <% const typeKey = r.reportType ? r.reportType.split(' ')[0] : 'Other'; %>
+          <div class="report-card" data-type="<%= r.reportType %>">
+            <span class="date-stamp"><%= new Date(r.uploadedAt).toLocaleDateString('en-IN') %></span>
+
+            <div class="report-icon icon-<%= typeKey.toLowerCase() %>">
+              <% if (r.reportType === 'Lab Report') { %><i class="fas fa-flask"></i>
+              <% } else if (r.reportType === 'X-Ray') { %><i class="fas fa-x-ray"></i>
+              <% } else if (r.reportType === 'Prescription') { %><i class="fas fa-prescription-bottle-alt"></i>
+              <% } else if (r.reportType === 'Discharge Summary') { %><i class="fas fa-file-alt"></i>
+              <% } else { %><i class="fas fa-file-medical"></i><% } %>
+            </div>
+
+            <span class="badge-type badge-<%= typeKey %>"><%= r.reportType %></span>
+            <h3><%= r.reportTitle %></h3>
+
+            <div class="report-meta">
+              <% if (r.doctor) { %><span><i class="fas fa-user-md"></i> Dr. <%= r.doctor %></span><% } %>
+              <% if (r.hospital) { %><span><i class="fas fa-hospital"></i> <%= r.hospital %></span><% } %>
+            </div>
+
+            <% if (r.notes) { %>
+              <div class="report-notes"><%= r.notes %></div>
+            <% } %>
+          </div>
+        <% }) %>
+      </div>
+    <% } else { %>
+      <div class="empty-state">
+        <i class="fas fa-folder-open"></i>
+        <h3 style="color:#e6eef6;margin-bottom:10px;">No Reports Yet</h3>
+        <p>Your medical reports uploaded by the hospital will appear here.</p>
+      </div>
+    <% } %>
+  </main>
+
+  <footer id="footer" class="footer">
+    <div class="footer-container">
+      <div class="footer-section about"><h3>Jeevan Raksha</h3><p>Delivering trusted, advanced healthcare since 1995.</p></div>
+      <div class="footer-section"><h4>Quick Links</h4><ul><li><a href="/home">Home</a></li><li><a href="/patient/dashboard">Dashboard</a></li></ul></div>
+      <div class="footer-section"><h4>Contact Us</h4><p>📞 +91 98765 43210</p></div>
+    </div>
+    <div class="footer-bottom"><p>© 2025 Jeevan Raksha Hospital</p></div>
+  </footer>
+
+  <script>
+    const btn = document.getElementById("profileBtn");
+    const menu = document.getElementById("dropdownMenu");
+    if (btn) { btn.addEventListener("click", e => { e.stopPropagation(); menu.style.display = menu.style.display === "block" ? "none" : "block"; }); }
+    document.addEventListener("click", () => { if (menu) menu.style.display = "none"; });
+
+    function filterReports() {
+      const type = document.getElementById("filterType").value;
+      document.querySelectorAll(".report-card").forEach(c => {
+        c.style.display = (!type || c.dataset.type === type) ? "" : "none";
+      });
+    }
+  </script>
+</body>
+</html>

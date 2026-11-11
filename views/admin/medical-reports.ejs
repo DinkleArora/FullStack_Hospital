@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Manage Medical Reports – Admin</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/footer.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .page-wrap { padding: 40px 20px; max-width: 1200px; margin: 0 auto; }
+    .page-title { color: var(--accent); font-size: 1.8em; margin-bottom: 8px; }
+    .section-block { background: var(--card); border: 1px solid rgba(58,123,255,0.25); border-radius: 14px; padding: 28px; margin-bottom: 30px; }
+    .section-block h3 { color: var(--accent); margin: 0 0 20px 0; font-size: 1.15em; border-bottom: 1px solid rgba(58,123,255,0.2); padding-bottom: 12px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-row { margin-bottom: 0; }
+    .form-row.full { grid-column: 1 / -1; }
+    .form-row label { display: block; margin-bottom: 5px; font-size: .88em; color: #e6eef6; font-weight: 500; }
+    .form-row input, .form-row select, .form-row textarea {
+      width: 100%; padding: 10px 13px; border-radius: 7px; border: 1px solid #334e7a;
+      background: #0f1724; color: #e6eef6; font-size: .9em; box-sizing: border-box;
+    }
+    .form-row input:focus, .form-row select:focus, .form-row textarea:focus { outline: none; border-color: var(--accent); }
+    .btn-add { background: var(--accent); color: white; border: none; padding: 11px 26px; border-radius: 8px; font-size: .93em; font-weight: 700; cursor: pointer; margin-top: 10px; }
+    .btn-add:hover { background: #2a68e6; }
+    .alert { padding: 12px 16px; border-radius: 8px; margin-bottom: 18px; font-weight: 500; }
+    .alert-success { background: rgba(74,222,128,0.1); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
+    .alert-danger { background: rgba(248,113,113,0.1); color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
+    .table-container { overflow-x: auto; border-radius: 10px; }
+    .data-table { width: 100%; border-collapse: collapse; font-size: .88em; min-width: 700px; }
+    .data-table th, .data-table td { padding: 11px 14px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.07); }
+    .data-table th { background: #1a3461; color: #a0bcd8; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; font-size: .8em; }
+    .data-table tr:hover td { background: rgba(58,123,255,0.05); }
+    .badge-type { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: .75em; font-weight: 700; }
+    .badge-lab { background: rgba(52,211,153,0.15); color: #34d399; }
+    .badge-xray { background: rgba(96,165,250,0.15); color: #60a5fa; }
+    .badge-rx { background: rgba(167,139,250,0.15); color: #a78bfa; }
+    .badge-dc { background: rgba(251,146,60,0.15); color: #fb923c; }
+    .badge-ot { background: rgba(156,163,175,0.15); color: #9ca3af; }
+    .btn-del { background: rgba(248,113,113,0.15); color: #f87171; border: 1px solid rgba(248,113,113,0.3); padding: 5px 12px; border-radius: 6px; font-size: .8em; cursor: pointer; }
+    .filter-bar { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+    .filter-bar input, .filter-bar select { padding: 8px 12px; border-radius: 8px; border: 1px solid #334e7a; background: #0f1724; color: #e6eef6; font-size: .88em; }
+    .stat-pills { display: flex; gap: 12px; margin-bottom: 22px; flex-wrap: wrap; }
+    .stat-pill { background: rgba(58,123,255,0.1); border: 1px solid rgba(58,123,255,0.2); border-radius: 8px; padding: 8px 18px; font-size: .85em; color: #e6eef6; }
+    .stat-pill strong { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <header class="main-header">
+    <div class="logo-section">
+      <i class="fas fa-heartbeat logo-icon"></i>
+      <h1>Jeevan Raksha — Admin</h1>
+    </div>
+    <nav class="center-nav">
+      <a href="/admin">Home</a>
+      <a href="/about">About</a>
+      <a href="/doctors">Doctors</a>
+    </nav>
+    <div class="nav-right">
+      <% if (session && session.user) { %>
+        <div class="profile-dropdown">
+          <button class="profile-btn" id="profileBtn">
+            <i class="fa fa-user-circle"></i>
+            <span><%= session.user.name %></span>
+            <i class="fa fa-caret-down"></i>
+          </button>
+          <div class="dropdown-menu" id="dropdownMenu">
+            <a href="/logout">Logout</a>
+          </div>
+        </div>
+      <% } %>
+    </div>
+  </header>
+
+  <main class="page-wrap">
+    <h2 class="page-title"><i class="fas fa-file-medical-alt"></i> Medical Reports</h2>
+
+    <div class="stat-pills">
+      <div class="stat-pill">Total Reports: <strong><%= reports.length %></strong></div>
+      <div class="stat-pill">Patients with Reports: <strong><%= new Set(reports.map(r=>r.patientId)).size %></strong></div>
+    </div>
+
+    <% if (msg) { %><div class="alert alert-success"><i class="fas fa-check-circle"></i> <%= msg %></div><% } %>
+    <% if (errorMsg) { %><div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> <%= errorMsg %></div><% } %>
+
+    <!-- UPLOAD FORM -->
+    <div class="section-block">
+      <h3><i class="fas fa-upload"></i> Upload / Add Report</h3>
+      <form action="/admin/reports/add" method="POST">
+        <div class="form-grid">
+          <div class="form-row">
+            <label>Patient ID *</label>
+            <input type="text" name="patientId" placeholder="e.g. P001" required>
+          </div>
+          <div class="form-row">
+            <label>Patient Name *</label>
+            <input type="text" name="patientName" placeholder="Full name" required>
+          </div>
+          <div class="form-row">
+            <label>Report Title *</label>
+            <input type="text" name="reportTitle" placeholder="e.g. Blood CBC Report" required>
+          </div>
+          <div class="form-row">
+            <label>Report Type *</label>
+            <select name="reportType" required>
+              <option value="Lab Report">Lab Report</option>
+              <option value="X-Ray">X-Ray</option>
+              <option value="Prescription">Prescription</option>
+              <option value="Discharge Summary">Discharge Summary</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>Doctor Name</label>
+            <input type="text" name="doctor" placeholder="Attending doctor">
+          </div>
+          <div class="form-row">
+            <label>Hospital</label>
+            <select name="hospital">
+              <option value="">-- Select Hospital --</option>
+              <option value="City Hospital">City Hospital</option>
+              <option value="Sunrise Medical Center">Sunrise Medical Center</option>
+              <option value="Apollo Clinic">Apollo Clinic</option>
+            </select>
+          </div>
+          <div class="form-row full">
+            <label>Notes / Findings</label>
+            <textarea name="notes" rows="3" placeholder="Enter report findings, notes or instructions..."></textarea>
+          </div>
+        </div>
+        <button type="submit" class="btn-add"><i class="fas fa-plus-circle"></i> Add Report</button>
+      </form>
+    </div>
+
+    <!-- REPORTS TABLE -->
+    <div class="section-block">
+      <h3><i class="fas fa-list"></i> All Medical Reports</h3>
+
+      <div class="filter-bar">
+        <input type="text" id="searchInput" placeholder="Search patient name or ID..." oninput="filterTable()">
+        <select id="filterType" onchange="filterTable()">
+          <option value="">All Types</option>
+          <option value="Lab Report">Lab Report</option>
+          <option value="X-Ray">X-Ray</option>
+          <option value="Prescription">Prescription</option>
+          <option value="Discharge Summary">Discharge Summary</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <div class="table-container">
+        <table class="data-table" id="reportTable">
+          <thead>
+            <tr>
+              <th>Patient</th>
+              <th>Patient ID</th>
+              <th>Report</th>
+              <th>Type</th>
+              <th>Doctor</th>
+              <th>Hospital</th>
+              <th>Date</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (reports && reports.length > 0) { %>
+              <% reports.forEach(r => { %>
+                <tr>
+                  <td><%= r.patientName %></td>
+                  <td><code style="color:#60a5fa;"><%= r.patientId %></code></td>
+                  <td><%= r.reportTitle %></td>
+                  <td>
+                    <% const tc = r.reportType === 'Lab Report' ? 'lab' : r.reportType === 'X-Ray' ? 'xray' : r.reportType === 'Prescription' ? 'rx' : r.reportType === 'Discharge Summary' ? 'dc' : 'ot'; %>
+                    <span class="badge-type badge-<%= tc %>"><%= r.reportType %></span>
+                  </td>
+                  <td><%= r.doctor || '—' %></td>
+                  <td><%= r.hospital || '—' %></td>
+                  <td><%= new Date(r.uploadedAt).toLocaleDateString('en-IN') %></td>
+                  <td>
+                    <form action="/admin/reports/delete/<%= r._id %>" method="POST" style="display:inline;" onsubmit="return confirm('Delete this report?')">
+                      <button type="submit" class="btn-del"><i class="fas fa-trash"></i></button>
+                    </form>
+                  </td>
+                </tr>
+              <% }) %>
+            <% } else { %>
+              <tr><td colspan="8" style="text-align:center;padding:24px;color:#8aa0c0;">No reports added yet.</td></tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <footer id="footer" class="footer">
+    <div class="footer-container">
+      <div class="footer-section about"><h3>Jeevan Raksha</h3><p>Admin Portal</p></div>
+      <div class="footer-section"><h4>Quick Links</h4><ul><li><a href="/admin">Dashboard</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><p>© 2025 Jeevan Raksha Hospital</p></div>
+  </footer>
+
+  <script>
+    const btn = document.getElementById("profileBtn");
+    const menu = document.getElementById("dropdownMenu");
+    if (btn) { btn.addEventListener("click", e => { e.stopPropagation(); menu.style.display = menu.style.display === "block" ? "none" : "block"; }); }
+    document.addEventListener("click", () => { if (menu) menu.style.display = "none"; });
+
+    function filterTable() {
+      const search = document.getElementById("searchInput").value.toLowerCase();
+      const type = document.getElementById("filterType").value;
+      document.querySelectorAll("#reportTable tbody tr").forEach(row => {
+        const text = row.textContent.toLowerCase();
+        const typeCell = row.cells[3] ? row.cells[3].textContent.trim() : "";
+        const matchSearch = text.includes(search);
+        const matchType = !type || typeCell === type;
+        row.style.display = matchSearch && matchType ? "" : "none";
+      });
+    }
+  </script>
+</body>
+</html>

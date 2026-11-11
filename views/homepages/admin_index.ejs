@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin Dashboard – Jeevan Raksha</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/footer.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .container { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; padding: 10px 40px 50px 40px; max-width: 1300px; margin: 0 auto; }
+    .card { background: var(--card); border: 1px solid rgba(58,123,255,0.25); border-radius: 14px; padding: 26px 22px; display: flex; flex-direction: column; align-items: flex-start; transition: transform .2s, border-color .2s; position: relative; overflow: hidden; }
+    .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), #00c6ff); opacity: 0; transition: opacity .2s; }
+    .card:hover { transform: translateY(-3px); border-color: var(--accent); }
+    .card:hover::before { opacity: 1; }
+    .card-icon { font-size: 1.7em; color: var(--accent); margin-bottom: 12px; background: rgba(58,123,255,0.1); width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+    .card-icon.report { color: #34d399; background: rgba(52,211,153,0.1); }
+    .card-icon.bed { color: #a78bfa; background: rgba(167,139,250,0.1); }
+    .card h2 { color: #e6eef6; font-size: 1.05em; margin: 0 0 8px 0; }
+    .card p { color: #8aa0c0; font-size: .87em; margin: 0 0 16px 0; line-height: 1.5; flex: 1; }
+    .card .btn { background: var(--accent); color: white; border: none; padding: 9px 20px; border-radius: 8px; font-size: .88em; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; }
+    .card .btn:hover { background: #2a68e6; }
+    .services-heading { text-align: center; color: var(--accent); font-size: 1.9em; margin: 36px 0 8px 0; }
+    .services-sub { text-align: center; color: #8aa0c0; margin-bottom: 28px; }
+  </style>
+</head>
+<body>
+  <header class="main-header">
+    <div class="logo-section">
+      <i class="fas fa-heartbeat logo-icon"></i>
+      <h1>Jeevan Raksha</h1>
+    </div>
+    <nav class="center-nav">
+      <a href="/admin">Home</a>
+      <a href="/about">About</a>
+      <a href="/doctors">Doctors</a>
+      <a href="#footer">Contact</a>
+    </nav>
+    <div class="nav-right">
+      <% if (session && session.user) { %>
+        <div class="profile-dropdown">
+          <button class="profile-btn" id="profileBtn">
+            <i class="fa fa-user-circle"></i>
+            <span><%= session.user.name %></span>
+            <i class="fa fa-caret-down"></i>
+          </button>
+          <div class="dropdown-menu" id="dropdownMenu">
+            <a href="/logout">Logout</a>
+          </div>
+        </div>
+      <% } else { %>
+        <a href="/login" class="login-btn">Login</a>
+      <% } %>
+    </div>
+  </header>
+
+  <section class="banner-section">
+    <div class="banner-overlay"></div>
+    <div class="banner-content">
+      <h2>Admin Control Panel</h2>
+    </div>
+  </section>
+
+  <h2 class="services-heading">Manage Hospital</h2>
+  <p class="services-sub">All administrative tools in one place</p>
+
+  <main class="container">
+    <div class="card">
+      <div class="card-icon"><i class="fas fa-calendar-check"></i></div>
+      <h2>Appointment Bookings</h2>
+      <p>Review, confirm or cancel all scheduled doctor appointments across hospitals.</p>
+      <a href="/admin/manage-bookings" class="btn">Manage Bookings</a>
+    </div>
+
+    <div class="card">
+      <div class="card-icon"><i class="fas fa-flask"></i></div>
+      <h2>Lab Tests</h2>
+      <p>Add new tests, update pricing, and edit descriptions for all available lab services.</p>
+      <a href="/admin/lab-tests" class="btn">Manage Lab Tests</a>
+    </div>
+
+    <div class="card">
+      <div class="card-icon"><i class="fas fa-clock"></i></div>
+      <h2>Doctor Slots</h2>
+      <p>Create and manage time slots for doctors. Control availability by date and time.</p>
+      <a href="/admin/slots" class="btn">Manage Slots</a>
+    </div>
+
+    <div class="card">
+      <div class="card-icon bed"><i class="fas fa-bed"></i></div>
+      <h2>Bed Management</h2>
+      <p>Monitor bed availability, assign beds to admitted patients, and handle bed requests.</p>
+      <a href="/admin/beds" class="btn">Manage Beds</a>
+    </div>
+
+    <div class="card">
+      <div class="card-icon"><i class="fas fa-ambulance"></i></div>
+      <h2>Ambulance Fleet</h2>
+      <p>Track ambulance availability, dispatch units, and manage driver assignments.</p>
+      <a href="/admin/ambulances" class="btn">Manage Ambulances</a>
+    </div>
+
+    <div class="card">
+      <div class="card-icon report"><i class="fas fa-file-medical-alt"></i></div>
+      <h2>Medical Reports</h2>
+      <p>Upload and manage patient lab reports, X-rays, prescriptions and discharge summaries.</p>
+      <a href="/admin/reports" class="btn">Manage Reports</a>
+    </div>
+  </main>
+
+  <footer id="footer" class="footer">
+    <div class="footer-container">
+      <div class="footer-section about">
+        <h3>Jeevan Raksha</h3>
+        <p>Delivering trusted, advanced, and compassionate healthcare since 1995.</p>
+        <p class="emergency"><b>Emergency Helpline:</b> <span>+91 108 / +91 98765 43210</span></p>
+      </div>
+      <div class="footer-section">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="/admin">Dashboard</a></li>
+          <li><a href="/about">About Us</a></li>
+          <li><a href="/doctors">Doctors</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4>Admin Tools</h4>
+        <ul>
+          <li><a href="/admin/manage-bookings">Manage Bookings</a></li>
+          <li><a href="/admin/lab-tests">Lab Tests</a></li>
+          <li><a href="/admin/slots">Doctor Slots</a></li>
+          <li><a href="/admin/reports">Medical Reports</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4>Contact Us</h4>
+        <p>📍 21, Health Street, Jaipur, Rajasthan, India</p>
+        <p>📞 +91 98765 43210</p>
+        <p>✉️ contact@jeevanraksha.in</p>
+      </div>
+      <div class="footer-section">
+        <h4>Follow Us</h4>
+        <div class="social-icons">
+          <a href="#"><i class="fab fa-facebook"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-linkedin"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 Jeevan Raksha Hospital • Secure | Smart | Live Health Insights</p>
+    </div>
+  </footer>
+
+  <script>
+    const btn = document.getElementById("profileBtn");
+    const menu = document.getElementById("dropdownMenu");
+    if (btn) { btn.addEventListener("click", e => { e.stopPropagation(); menu.style.display = menu.style.display === "block" ? "none" : "block"; }); }
+    document.addEventListener("click", () => { if (menu) menu.style.display = "none"; });
+  </script>
+</body>
+</html>
