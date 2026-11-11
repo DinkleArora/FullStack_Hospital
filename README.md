@@ -1,3 +1,4 @@
+
 Hospital Healthcare Portal
 
 A full-stack web application designed to simplify hospital operations and improve patient accessibility through an integrated healthcare management platform.
@@ -115,3 +116,4 @@ http://localhost:8080
 ## License
 
 This project is developed for educational purposes.
+
